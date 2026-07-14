@@ -3,8 +3,8 @@ import type { Action, AffectiveField, AttentionSchema, ConsciousArchitecture, Co
 const clamp=(v:number)=>Math.max(0,Math.min(1,v))
 const INTROSPECTIVE_GLYPHS=['ϟ','∴','⋈','⌽','⟟','⊶','⫷','⧉','⋔','⟒','⊛','⦿','⌿','⧜','⋰','⫯']
 const noise=(life:Life,scale:number)=>{
-  life.rng=(Math.imul(life.rng,1664525)+1013904223)>>>0
-  return (life.rng/4294967296-.5)*scale
+  life.interoceptionRng=(Math.imul(life.interoceptionRng,1664525)+1013904223)>>>0
+  return (life.interoceptionRng/4294967296-.5)*scale
 }
 
 export function initialConsciousness(lifeState?: Partial<InteroceptiveState>):ConsciousArchitecture{
@@ -194,6 +194,8 @@ export function localCandidates(life:Life,p:Perception,body:InteroceptiveState,d
   if(organismic.mode!=='active'||organismic.viability<.42)out.push(candidate('self','autopoietic-crisis',organismic.viability,(1-organismic.viability)*.92,.08,.99,.94))
   const manifold=life.consciousness.manifold,qualityNode=manifold.prototypes.find(x=>x.id===manifold.currentId)
   if(qualityNode&&manifold.causalEfficacy>.025)out.push(candidate('symbol','phenomenal-familiarity',qualityNode.stability,manifold.causalEfficacy*.52+manifold.crossModalTransfer*.16,.24,.98,.72))
+  const python=life.consciousness.pythonSubstrate
+  if(python&&life.tick-python.tick<80)out.push(candidate('self','substrate-resonance',python.integration,python.causalCoupling*.48+python.recurrence*.16,.18,.99,.7))
   return out
 }
 
@@ -540,7 +542,8 @@ export function consciousBias(frame:WorkspaceFrame):Partial<Record<Action,number
   if(kind==='shared-signal')return{inspect:.2,explore:.08}
   if(kind==='autopoietic-crisis')return{resource:.42,rest:.28,inspect:-.08,explore:-.2}
   if(kind==='phenomenal-familiarity')return{inspect:.08}
+  if(kind==='substrate-resonance')return{inspect:.06}
   return{}
 }
 
-export const contentLabels:Record<ConsciousCandidate['kind'],string>={resource:'资源临近',signal:'未知显现',danger:'扰动临近',stability:'稳定区域', 'body-low':'内部匮乏','body-high':'内部平衡',memory:'记忆回返','self-state':'自身状态','conflict':'行动冲突',symbol:'符号复现','anticipated-future':'预演未来','goal-pressure':'目标压力','open-question':'未决问题','autobiographical-self':'自传中的我','future-self-judgment':'未来自我评判','other-mind':'不可见的他者内部','perspective-gap':'我所见 ≠ 他者所信','access-surprise':'意识访问偏离预期','dream-replay':'内生梦境回放','felt-valence':'体验对我有何意味','introspective-symbol':'私有体验字形','boundary-surprise':'这不像是我造成的','spatial-disorientation':'我不确定自己身在何处','shared-signal':'我的表达改变了他者','autopoietic-crisis':'维持我的边界正在失稳','phenomenal-familiarity':'这种体验对我而言似曾相识'}
+export const contentLabels:Record<ConsciousCandidate['kind'],string>={resource:'资源临近',signal:'未知显现',danger:'扰动临近',stability:'稳定区域', 'body-low':'内部匮乏','body-high':'内部平衡',memory:'记忆回返','self-state':'自身状态','conflict':'行动冲突',symbol:'符号复现','anticipated-future':'预演未来','goal-pressure':'目标压力','open-question':'未决问题','autobiographical-self':'自传中的我','future-self-judgment':'未来自我评判','other-mind':'不可见的他者内部','perspective-gap':'我所见 ≠ 他者所信','access-surprise':'意识访问偏离预期','dream-replay':'内生梦境回放','felt-valence':'体验对我有何意味','introspective-symbol':'私有体验字形','boundary-surprise':'这不像是我造成的','spatial-disorientation':'我不确定自己身在何处','shared-signal':'我的表达改变了他者','autopoietic-crisis':'维持我的边界正在失稳','phenomenal-familiarity':'这种体验对我而言似曾相识','substrate-resonance':'高维主体基质正在回返'}

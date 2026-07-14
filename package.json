@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "kernel": "PYTHONPATH=python python -m sentiogenesis.server",
+    "python:test": "PYTHONPATH=python python -m unittest discover -s python/tests -v",
     "build": "tsc && vite build",
     "test": "vitest run",
     "test:watch": "vitest"

@@ -6,26 +6,30 @@ export const STORAGE_KEY='electronic-life.snapshot.v1'
 export class SnapshotError extends Error { constructor(message:string, public readonly raw:string){super(message)} }
 
 export function saveLife(life: Life, storage: Storage=localStorage) {
-  const now=Date.now(), snapshot:Snapshot={version:22,savedAt:now,life:{...life,lastSavedAt:now}}
+  const now=Date.now(), snapshot:Snapshot={version:25,savedAt:now,life:{...life,lastSavedAt:now}}
   storage.setItem(STORAGE_KEY,JSON.stringify(snapshot)); return snapshot.life
 }
 export function loadLife(storage: Storage=localStorage):Life|null {
   const raw=storage.getItem(STORAGE_KEY); if(!raw)return null
   try {
     const data=JSON.parse(raw) as Snapshot
-    if(![1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22].includes(data.version)||!data.life?.id||typeof data.savedAt!=='number') throw new Error('存档版本不兼容')
+    if(![1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25].includes(data.version)||!data.life?.id||typeof data.savedAt!=='number') throw new Error('存档版本不兼容')
     hydrateConsciousness(data.life)
     return settleOffline(data.life,Date.now()-data.savedAt)
   } catch(error) { throw new SnapshotError(error instanceof Error?error.message:'存档损坏',raw) }
 }
-export function exportSnapshot(life:Life){return JSON.stringify({version:22,savedAt:Date.now(),life} satisfies Snapshot,null,2)}
+export function exportSnapshot(life:Life){return JSON.stringify({version:25,savedAt:Date.now(),life} satisfies Snapshot,null,2)}
 export function importSnapshot(raw:string):Life {
   const data=JSON.parse(raw) as Snapshot
-  if(![1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22].includes(data.version)||!data.life?.id||!data.life.state||!data.life.environment) throw new Error('不是有效的生命存档')
+  if(![1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25].includes(data.version)||!data.life?.id||!data.life.state||!data.life.environment) throw new Error('不是有效的生命存档')
   hydrateConsciousness(data.life)
   return data.life
 }
 function hydrateConsciousness(life:Life){
+  life.environmentRng??=(life.seed^0xA5A5A5A5)>>>0
+  life.interoceptionRng??=(life.seed^0x6C8E9CF5)>>>0
+  life.spatialRng??=(life.seed^0x3D20ADEA)>>>0
+  life.nextInterventionId??=-1
   life.environment.other??={id:'OTHER-01',x:22,y:28,heading:0,observableAction:'idle',hidden:{energy:.64,uncertainty:.55,preference:.5,glyphModels:{},lastPulseTick:-1,lastObservedMainTick:-1,lastEchoTick:-1}}
   life.environment.other.hidden.glyphModels??={}
   life.environment.other.hidden.lastPulseTick??=-1

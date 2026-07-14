@@ -1,7 +1,7 @@
 export type Action = 'explore' | 'resource' | 'avoid' | 'rest' | 'inspect'
 export type Intervention = 'resource' | 'signal' | 'disturbance'
 export type ModuleId = 'exteroception' | 'interoception' | 'threat' | 'novelty' | 'memory' | 'self' | 'value' | 'symbol' | 'imagination' | 'goal' | 'epistemic' | 'social' | 'attention'
-export type ContentKind = 'resource' | 'signal' | 'danger' | 'stability' | 'body-low' | 'body-high' | 'memory' | 'self-state' | 'conflict' | 'symbol' | 'anticipated-future' | 'goal-pressure' | 'open-question' | 'autobiographical-self' | 'future-self-judgment' | 'other-mind' | 'perspective-gap' | 'access-surprise' | 'dream-replay' | 'felt-valence' | 'introspective-symbol' | 'boundary-surprise' | 'spatial-disorientation' | 'shared-signal' | 'autopoietic-crisis' | 'phenomenal-familiarity'
+export type ContentKind = 'resource' | 'signal' | 'danger' | 'stability' | 'body-low' | 'body-high' | 'memory' | 'self-state' | 'conflict' | 'symbol' | 'anticipated-future' | 'goal-pressure' | 'open-question' | 'autobiographical-self' | 'future-self-judgment' | 'other-mind' | 'perspective-gap' | 'access-surprise' | 'dream-replay' | 'felt-valence' | 'introspective-symbol' | 'boundary-surprise' | 'spatial-disorientation' | 'shared-signal' | 'autopoietic-crisis' | 'phenomenal-familiarity' | 'substrate-resonance'
 
 export interface Vec2 { x: number; y: number }
 export interface StateVector {
@@ -83,6 +83,61 @@ export interface SymbolNode {
   drift: number
   status: 'forming' | 'stable' | 'drifting' | 'forgotten'
 }
+export interface CandidateEvidence {
+  perception:Perception
+  body:InteroceptiveState
+  drives:Record<Action,number>
+  imagined:ImaginedOutcome[]
+  agency:number
+  coherence:number
+  bestMemory?:Pick<Memory,'strength'|'impact'>
+  bestSymbol?:Pick<SymbolNode,'id'|'stability'>
+  goal?:Pick<EndogenousGoal,'target'|'urgency'|'persistence'>
+  question?:Pick<EpistemicQuestion,'currentConfidence'|'urgency'|'status'>
+  chapterIdentityImpact?:number
+  narrativeContinuity:number
+  maxFutureRegret:number
+  lastEndorsement?:number
+  commitmentStrain:number
+  recursiveAppraisals:boolean
+  socialConfidence:number
+  beliefDivergence:number
+  attentionError:number
+  dream:Pick<DreamState,'mode'|'vividness'|'residue'>
+  affect:Pick<AffectiveField,'tone'|'qualityMismatch'|'precision'|'experientialValues'>
+  privateGlyph?:string
+  privateConfidence:number
+  externalSurprise:number
+  selfCausedLikelihood:number
+  spatialUncertainty:number
+  mapSurprise:number
+  communicationResponse:SocialCommunication['lastResponse']
+  communicationSurprise:number
+  communicativeAgency:number
+  organismicMode:OrganismicClosure['mode']
+  organismicViability:number
+  qualityNode?:Pick<PhenomenalPrototype,'id'|'stability'>
+  manifoldEfficacy:number
+  manifoldTransfer:number
+  substrate?:Pick<PythonSubstrate,'tick'|'integration'|'causalCoupling'|'recurrence'>
+}
+export interface DecisionEvidence {
+  baseDrives:Record<Action,number>
+  perception?:Perception
+  body?:InteroceptiveState
+  stateCuriosity?:number
+  stateCoherence?:number
+  beliefs?:Beliefs
+  foregroundKind?:ContentKind
+  question?:Pick<EpistemicQuestion,'targetAction'|'expectedInformationGain'|'urgency'|'status'>
+  appraisals:Array<Pick<FutureSelfAppraisal,'action'|'futureApproval'|'anticipatedRegret'>>
+  affect:Pick<AffectiveField,'tone'|'qualityMismatch'>
+  introspectiveCluster?:Pick<IntrospectiveCluster,'glyph'|'predictiveConfidence'|'forecast'>
+  dream:Pick<DreamState,'mode'|'sleepPressure'|'restStreak'>
+  communicationPending?:Pick<NonNullable<SocialCommunication['pending']>,'expectedAction'|'phase'|'tick'>
+  phenomenalNode?:Pick<PhenomenalPrototype,'actionValues'|'actionSamples'>
+  imagination:ImaginedOutcome[]
+}
 export interface CausalTrace {
   id: number
   tick: number
@@ -93,6 +148,30 @@ export interface CausalTrace {
   outcome: number
   surprise: number
   attribution: number
+  clusterId?:number
+  decisionSource?:'python'|'browser'
+  intentBasedOnTick?:number
+  dreamSourceMemoryId?:number
+  experienceVector?:number[]
+  affectObservation?:{sourceKind?:ContentKind;outcome:number;valenceDelta:number;surprise:number;currentValence:number;quality:PhenomenalField['quality']}
+  dreamObservation?:{lastAction?:Action;danger:number;arousal:number;energy:number;organismicMode:OrganismicClosure['mode'];bestMemory?:{id:number;strength:number;surprise:number;impact:number};activeMemory?:{id:number;strength:number;surprise:number;impact:number}}
+  narrativeObservation?:{sourceTick:number;action:Action;foregroundId?:string;foregroundKind?:ContentKind;attribution:number;surprise:number;sourceBody:InteroceptiveState;currentBody:InteroceptiveState;goalSignature:string}
+  goalObservation?:{body:InteroceptiveState;valence:number;coherence:number}
+  epistemicObservation?:{previousAction?:Action;body:InteroceptiveState;perception:Perception;stateEnergy:number;stateIntegrity:number;causalModels:Record<Action,LearnedTransition>}
+  recursiveObservation?:{body:InteroceptiveState;goals:EndogenousGoal[];actionProfile:Record<Action,number>;selfContinuity:number;imagination:ImaginedOutcome[];action:Action;outcome:number;agency:number}
+  attentionObservation?:{predicted?:ContentKind;target?:ContentKind;actual?:ContentKind;unconsciousCount:number;backgroundCount:number;candidates:Array<{kind:ContentKind;salience:number;selfRelevance:number;persistence:number}>}
+  socialObservation?:{awake:boolean;other:OtherObservation;evidence:PublicResourceEvidence[]}
+  communicationObservation?:{observedOther:OtherAction;otherPulseGlyph?:string;otherPresence:number;dreamMode:'wake'|'dream';energy:number;position:Vec2;socialPulseActive:boolean;expression?:IntrospectiveExpression;clusterCentroid?:number[]}
+  causalObservation?:{currentBody:InteroceptiveState;previousAction?:Action;previousBody?:InteroceptiveState;valenceDelta:number}
+  interoceptionObservation?:{truth:Pick<StateVector,'energy'|'integrity'|'arousal'|'uncertainty'>;inspect:boolean}
+  spatialObservation?:{last?:Pick<CausalTrace,'positionBefore'|'positionAfter'|'headingBefore'|'headingAfter'>;scene:EgocentricScene}
+  phenomenalObservation?:{candidates:ConsciousCandidate[];attentionTarget?:ContentKind;attentionEffort:number;dangerBroadcastBlocked:boolean}
+  introspectionObservation?:{field:PhenomenalField;foreground?:ConsciousCandidate;affectTone:number;ownedBySelf:number;dreamMode:'wake'|'dream'}
+  imaginationObservation?:{perception:Perception;body:InteroceptiveState;drives:Record<Action,number>;stateValence:number;stateCoherence:number;beliefPredictability:number;causalModels:Record<Action,LearnedTransition>;goals:EndogenousGoal[]}
+  temporalObservation?:{foreground?:ConsciousCandidate;anticipatedNext?:ImaginedOutcome}
+  stateDynamicsObservation?:{postActionState:StateVector;action:Action;perception:Perception;prediction:number;outcome:number;metabolicFactor:number;attentionActive:boolean;attentionEffort:number;efference:Pick<EfferenceState,'selfCausedLikelihood'|'externalSurprise'>}
+  candidateObservation?:CandidateEvidence
+  decisionObservation?:DecisionEvidence
   stateDelta: Partial<StateVector>
   workspaceContent?: ConsciousCandidate
   subjectiveBody?: InteroceptiveState
@@ -363,6 +442,88 @@ export interface PhenomenalManifold {
   crossModalTransfer:number
   causalEfficacy:number
 }
+export interface PythonAuthorityPatch {
+  fromTick:number
+  toTick:number
+  organismic:OrganismicClosure
+  manifold:PhenomenalManifold
+  memories:Memory[]
+  beliefs:Beliefs
+  nextMemoryId:number
+  actionIntent:{basedOnTick:number;action:Action;scores:Record<Action,number>}
+  efference:EfferenceState
+  efferenceCursor:number
+  abiotic:{resources:Entity[];signals:Entity[];disturbances:Entity[];stableZones:Entity[]}
+  environmentRng:number
+  environmentCursor:number
+  nextEntityId:number
+  clusters:ExperienceCluster[]
+  symbols:SymbolNode[]
+  nextClusterId:number
+  nextSymbolId:number
+  symbolicCursor:number
+  affect:AffectiveField
+  affectCursor:number
+  dream:DreamState
+  dreamCursor:number
+  narrative:NarrativeSelf
+  narrativeCursor:number
+  preferredSetpoints:Record<SubjectiveDimension,number>
+  goals:EndogenousGoal[]
+  goalCursor:number
+  epistemic:{active?:EpistemicQuestion;history:EpistemicQuestion[]}
+  epistemicCursor:number
+  recursiveSelf:RecursiveSelf
+  recursiveCursor:number
+  attentionSchema:AttentionSchema
+  attentionCursor:number
+  attentionIntent:{basedOnTick:number;target?:ContentKind}
+  social:SocialCognition
+  socialCursor:number
+  communication:SocialCommunication
+  communicationCursor:number
+  communicationEmission?:{glyph:string;position:Vec2;phase:'statement'|'repair';bornTick:number}
+  communicationCost:number
+  causalModels:Record<Action,LearnedTransition>
+  causalCursor:number
+  interoception:InteroceptiveState
+  interoceptionRng:number
+  interoceptionCursor:number
+  spatial:SpatialSelfModel
+  spatialRng:number
+  spatialCursor:number
+  phenomenalField:PhenomenalField
+  workspace:WorkspaceFrame
+  meta:MetaState
+  phenomenalCursor:number
+  imagination?:ImaginedOutcome[]
+  imaginationCursor?:number
+  temporalField?:TemporalField
+  temporalCursor?:number
+  introspection?:IntrospectiveLexicon
+  introspectionCursor?:number
+  state?:StateVector
+  stateCursor?:number
+  candidates?:ConsciousCandidate[]
+  candidateCursor?:number
+  accessHistory?:WorkspaceFrame[]
+  accessCursor?:number
+  energyCost:number
+}
+export interface PythonSubstrate {
+  protocol:1
+  identity:string
+  tick:number
+  backend:string
+  dimensions:number
+  latent:number[]
+  integration:number
+  differentiation:number
+  recurrence:number
+  causalCoupling:number
+  updates:number
+  authority:PythonAuthorityPatch
+}
 export interface ConsciousArchitecture {
   architectureVersion: 21
   interoception: InteroceptiveState
@@ -389,12 +550,16 @@ export interface ConsciousArchitecture {
   communication: SocialCommunication
   organismic: OrganismicClosure
   manifold: PhenomenalManifold
+  pythonSubstrate?:PythonSubstrate
 }
 export interface Life {
   id: string
   bornAt: number
   seed: number
   rng: number
+  environmentRng:number
+  interoceptionRng:number
+  spatialRng:number
   tick: number
   position: Vec2
   heading: number
@@ -408,10 +573,11 @@ export interface Life {
   history: Array<{ tick: number; state: StateVector }>
   cooldowns: Record<Intervention, number>
   nextEntityId: number
+  nextInterventionId:number
   nextMemoryId: number
   nextClusterId: number
   nextSymbolId: number
   lastSavedAt: number
   consciousness: ConsciousArchitecture
 }
-export interface Snapshot { version: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22; savedAt: number; life: Life }
+export interface Snapshot { version: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25; savedAt: number; life: Life }
